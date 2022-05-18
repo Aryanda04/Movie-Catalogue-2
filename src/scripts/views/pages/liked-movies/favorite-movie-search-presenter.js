@@ -13,9 +13,15 @@ class FavoriteMovieSearchPresenter {
     });
   }
 
-  _searchMovies(latestQuery) {
-    this._latestQuery = latestQuery;
-    this._favoriteMovies.searchMovies(this.latestQuery);
+  async _searchMovies(latestQuery) {
+    this._latestQuery = latestQuery.trim();
+    let foundMovies;
+    if (this.latestQuery.length > 0) {
+      foundMovies = await this._favoriteMovies.searchMovies(this.latestQuery);
+    } else {
+      foundMovies = await this._favoriteMovies.getAllMovies();
+    }
+    this._showFoundMovies(foundMovies);
   }
 
   _showFoundMovies(movies) {
@@ -25,6 +31,9 @@ class FavoriteMovieSearchPresenter {
     );
 
     document.querySelector('.movies').innerHTML = html;
+
+    document.getElementById('movie-search-container')
+      .dispatchEvent(new Event('movies:searched:updated'));
   }
 
   get latestQuery() {
